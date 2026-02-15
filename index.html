@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REBUILD SAFI 2050 - Plan de Développement Territorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        :root {
+            --ocean-blue: #1B4F72;
+            --ocean-light: #2E86AB;
+            --safi-green: #2E7D32;
+            --green-light: #4CAF50;
+            --ochre: #D35400;
+            --ochre-light: #E67E22;
+            --light-gray: #ECF0F1;
+            --dark-gray: #2C3E50;
+            --white: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--ocean-blue);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--ocean-blue), var(--safi-green));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 600;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ocean-blue);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--ocean-blue);
+        }
+
+        .nav-cta {
+            background: var(--ochre);
+            color: white !important;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--ochre-light);
+            transform: translateY(-2px);
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(27,79,114,0.8), rgba(46,125,50,0.8)),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>'),
+                        linear-gradient(to bottom, var(--ocean-blue), var(--safi-green));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            padding: 2rem;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--ochre);
+            color: white;
+            box-shadow: 0 4px 15px rgba(211,84,0,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(211,84,0,0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--ocean-blue);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--light-gray);
+            color: var(--ocean-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: var(--ocean-blue);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Vision Section */
+        .vision {
+            background: var(--light-gray);
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .vision-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vision-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--ocean-blue);
+        }
+
+        .vision-card:nth-child(2)::before { background: var(--safi-green); }
+        .vision-card:nth-child(3)::before { background: var(--ochre); }
+        .vision-card:nth-child(4)::before { background: var(--ocean-light); }
+
+        .vision-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .vision-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--light-gray);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--ocean-blue);
+        }
+
+        .vision-card:nth-child(2) .vision-icon { color: var(--safi-green); }
+        .vision-card:nth-child(3) .vision-icon { color: var(--ochre); }
+        .vision-card:nth-child(4) .vision-icon { color: var(--ocean-light); }
+
+        .vision-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .vision-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Interactive Map Styles */
+        .map-card-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-top: 3rem;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .map-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--ocean-blue), var(--ocean-light));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .map-title-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .map-title-section i {
+            font-size: 2rem;
+            opacity: 0.9;
+        }
+
+        .map-title-section h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .map-title-section p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .map-legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .interactive-map {
+            height: 500px;
+            width: 100%;
+            background: #f0f0f0;
+        }
+
+        .map-controls {
+            padding: 1rem 2rem;
+            background: var(--light-gray);
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            border-top: 1px solid #ddd;
+        }
+
+        .map-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid transparent;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            color: var(--dark-gray);
+        }
+
+        .map-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .map-btn.active {
+            background: var(--ocean-blue);
+            color: white;
+        }
+
+        /* Custom Markers */
+        .custom-marker {
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 3px solid;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+            z-index: 1000 !important;
+        }
+
+        .marker-resilience { border-color: #1B4F72; color: #1B4F72; }
+        .marker-green { border-color: #2E7D32; color: #2E7D32; }
+        .marker-industry { border-color: #D35400; color: #D35400; }
+        .marker-tourism { border-color: #2E86AB; color: #2E86AB; }
+
+        /* Project Detail Popup */
+        .project-popup {
+            position: absolute;
+            right: 20px;
+            top: 80px;
+            width: 320px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, var(--ocean-blue), var(--ocean-light));
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .popup-header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            max-width: 80%;
+        }
+
+        .close-popup {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-popup:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .popup-content {
+            padding: 1.5rem;
+        }
+
+        .popup-category {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .popup-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .popup-stats div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-gray);
+            font-weight: 600;
+        }
+
+        .popup-stats i {
+            color: var(--ochre);
+        }
+
+        .popup-link {
+            display: block;
+            text-align: center;
+            padding: 0.8rem;
+            background: var(--light-gray);
+            color: var(--ocean-blue);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .popup-link:hover {
+            background: var(--ocean-blue);
+            color: white;
+        }
+
+        /* Leaflet Popup Customization */
+        .custom-popup .leaflet-popup-content-wrapper {
+            border-radius: 15px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            width: 280px !important;
+        }
+
+        /* Pillars Section */
+        .pillars {
+            background: white;
+        }
+
+        .pillars-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .pillar-card {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+            background: var(--light-gray);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .pillar-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .pillar-visual {
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 2rem;
+        }
+
+        .pillar-1 .pillar-visual { background: linear-gradient(135deg, var(--ocean-blue), var(--ocean-light)); }
+        .pillar-2 .pillar-visual { background: linear-gradient(135deg, var(--safi-green), var(--green-light)); }
+        .pillar-3 .pillar-visual { background: linear-gradient(135deg, var(--ochre), var(--ochre-light)); }
+        .pillar-4 .pillar-visual { background: linear-gradient(135deg, var(--ocean-light), var(--safi-green)); }
+
+        .pillar-number {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 5rem;
+            font-weight: 800;
+            opacity: 0.3;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .pillar-icon-main {
+            font-size: 4rem;
+            z-index: 2;
+        }
+
+        .pillar-content {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .pillar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pillar-tag {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pillar-1 .pillar-tag { color: var(--ocean-blue); }
+        .pillar-2 .pillar-tag { color: var(--safi-green); }
+        .pillar-3 .pillar-tag { color: var(--ochre); }
+        .pillar-4 .pillar-tag { color: var(--ocean-light); }
+
+        .pillar-content h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--dark-gray);
+        }
+
+        .pillar-objective {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .pillar-1 .pillar-objective { border-color: var(--ocean-blue); }
+        .pillar-2 .pillar-objective { border-color: var(--safi-green); }
+        .pillar-3 .pillar-objective { border-color: var(--ochre); }
+        .pillar-4 .pillar-objective { border-color: var(--ocean-light); }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .action-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-item p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .pillar-meta {
+            display: flex;
+            gap: 2rem;
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meta-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-gray);
+        }
+
+        .project-highlight {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            border: 2px solid;
+        }
+
+        .pillar-1 .project-highlight { border-color: var(--ocean-blue); }
+        .pillar-2 .project-highlight { border-color: var(--safi-green); }
+        .pillar-3 .project-highlight { border-color: var(--ochre); }
+        .pillar-4 .project-highlight { border-color: var(--ocean-light); }
+
+        .project-highlight h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timeline Section */
+        .timeline {
+            background: var(--ocean-blue);
+            color: white;
+        }
+
+        .timeline .section-title {
+            color: white;
+        }
+
+        .timeline .section-subtitle {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 4rem auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 50%;
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 50%;
+        }
+
+        .timeline-content {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--ochre);
+            border-radius: 50%;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid var(--ocean-blue);
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: 50%;
+        }
+
+        .timeline-year {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--ochre);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .timeline-content ul {
+            list-style: none;
+            font-size: 0.95rem;
+        }
+
+        .timeline-content li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .timeline-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--ochre);
+        }
+
+        /* Dashboard Section */
+        .dashboard {
+            background: var(--light-gray);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+        }
+
+        .dashboard-status {
+            width: 10px;
+            height: 10px;
+            background: var(--green-light);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76,175,80,0); }
+            100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+        }
+
+        .metric-large {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--ocean-blue);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .metric-change {
+            color: var(--green-light);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .chart-placeholder {
+            height: 150px;
+            background: linear-gradient(135deg, var(--light-gray), white);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            margin-top: 1rem;
+            border: 2px dashed #ddd;
+        }
+
+        /* Participation Section */
+        .participation {
+            background: white;
+        }
+
+        .participation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .participation-card {
+            background: var(--light-gray);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .participation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .participation-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--ocean-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .participation-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .participation-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-participate {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--ocean-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-participate:hover {
+            background: var(--ocean-light);
+            transform: scale(1.05);
+        }
+
+        /* Governance Section */
+        .governance {
+            background: var(--dark-gray);
+            color: white;
+        }
+
+        .governance .section-title {
+            color: white;
+        }
+
+        .governance .section-subtitle {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .org-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .org-level {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .org-level h3 {
+            color: var(--ochre);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .org-level ul {
+            list-style: none;
+        }
+
+        .org-level li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+        }
+
+        .org-level li:last-child {
+            border-bottom: none;
+        }
+
+        /* Resources Section */
+        .resources {
+            background: var(--light-gray);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .resource-icon {
+            height: 150px;
+            background: linear-gradient(135deg, var(--ocean-blue), var(--ocean-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .resource-content {
+            padding: 1.5rem;
+        }
+
+        .resource-content h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .resource-content p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .download-btn {
+            color: var(--ocean-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-gray);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+        }
+
+        .footer-section h4 {
+            color: var(--ochre);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--ochre);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--ochre);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .pillar-card {
+                grid-template-columns: 1fr;
+            }
+
+            .pillar-visual {
+                min-height: 200px;
+            }
+
+            .timeline-line {
+                left: 20px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                justify-content: flex-start;
+                padding-left: 50px;
+                padding-right: 0;
+            }
+
+            .timeline-dot {
+                left: 20px !important;
+                transform: translateX(-50%);
+            }
+
+            .interactive-map {
+                height: 400px;
+            }
+            
+            .project-popup {
+                right: 10px;
+                left: 10px;
+                width: auto;
+                top: auto;
+                bottom: 100px;
+            }
+            
+            .map-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .map-legend {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Notification Bar */
+        .notification-bar {
+            background: var(--ochre);
+            color: white;
+            text-align: center;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 999;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .notification-bar.show {
+            transform: translateY(0);
+        }
+
+        .notification-bar a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-city"></i>
+                </div>
+                <span>REBUILD SAFI</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#vision">Vision</a></li>
+                <li><a href="#pillars">4 Piliers</a></li>
+                <li><a href="#timeline">Calendrier</a></li>
+                <li><a href="#dashboard">Observatoire</a></li>
+                <li><a href="#participation">Participer</a></li>
+                <li><a href="#resources">Ressources</a></li>
+                <li><a href="#participation" class="nav-cta">Agir Maintenant</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-map-marker-alt"></i> Commune de Safi • 2026-2050
+            </div>
+            <h1>REBUILD SAFI</h1>
+            <p class="hero-subtitle">Plan de Développement Territorial • Une ville résiliente, verte, industrielle durable et touristique</p>
+           
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">4</span>
+                    <span class="stat-label">Piliers Stratégiques</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">25</span>
+                    <span class="stat-label">Années de Transformation</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Projets Emblématiques</span>
+                </div>
+            </div>
+
+            <div class="hero-cta">
+                <a href="#pillars" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Découvrir le Plan
+                </a>
+                <a href="#participation" class="btn btn-secondary">
+                    <i class="fas fa-users"></i> Participer
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down fa-2x"></i>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section id="vision" class="vision">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Notre Vision</span>
+                <h2 class="section-title">Construire Safi 2050</h2>
+                <p class="section-subtitle">
+                    Un plan qui vient de la ville elle-même, répondant aux besoins réels de la population pour les 25 prochaines années
+                </p>
+            </div>
+
+            <div class="vision-grid">
+                <div class="vision-card fade-in">
+                    <div class="vision-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Résilience</h3>
+                    <p>Protection contre les risques naturels, maîtrise du oued, urbanisme intelligent et prévention des inondations</p>
+                </div>
+                <div class="vision-card fade-in">
+                    <div class="vision-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Écologie</h3>
+                    <p>15 m² d'espaces verts par habitant, jardins botaniques, oued végétalisé et qualité de vie améliorée</p>
+                </div>
+                <div class="vision-card fade-in">
+                    <div class="vision-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3>Industrie Durable</h3>
+                    <p>Partenariat OCP stratégique, 10 000 emplois créés, zones industrielles 4.0 et innovation locale</p>
+                </div>
+                <div class="vision-card fade-in">
+                    <div class="vision-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <h3>Tourisme & Culture</h3>
+                    <p>Patrimoine révélé, 500 000 touristes annuels, écotourisme responsable et rayonnement culturel</p>
+                </div>
+            </div>
+
+            <!-- Interactive Map Card -->
+            <div class="map-card-container">
+                <div class="map-header">
+                    <div class="map-title-section">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <div>
+                            <h3>Carte Interactive des Projets</h3>
+                            <p>Localisation des 50+ projets REBUILD SAFI • Cliquez sur les marqueurs</p>
+                        </div>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #1B4F72;"></span>
+                            <span>Résilience</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #2E7D32;"></span>
+                            <span>Vert</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #D35400;"></span>
+                            <span>Industrie</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #2E86AB;"></span>
+                            <span>Tourisme</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="safi-map" class="interactive-map"></div>
+                
+                <div class="map-controls">
+                    <button class="map-btn active" onclick="filterProjects('all')">Tous</button>
+                    <button class="map-btn" onclick="filterProjects('resilience')">Résilience</button>
+                    <button class="map-btn" onclick="filterProjects('green')">Vert</button>
+                    <button class="map-btn" onclick="filterProjects('industry')">Industrie</button>
+                    <button class="map-btn" onclick="filterProjects('tourism')">Tourisme</button>
+                    <button class="map-btn" onclick="resetMap()" style="margin-left: auto;"><i class="fas fa-compress-arrows-alt"></i> Recentrer</button>
+                </div>
+                
+                <div class="project-popup" id="project-popup" style="display: none;">
+                    <div class="popup-header">
+                        <h4 id="popup-title">Projet</h4>
+                        <button class="close-popup" onclick="closePopup()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="popup-content">
+                        <span class="popup-category" id="popup-category">Catégorie</span>
+                        <p id="popup-description">Description du projet...</p>
+                        <div class="popup-stats">
+                            <div><i class="fas fa-money-bill-wave"></i> <span id="popup-budget">--</span></div>
+                            <div><i class="fas fa-calendar"></i> <span id="popup-date">--</span></div>
+                        </div>
+                        <a href="#" class="popup-link">Voir les détails <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pillars Section -->
+    <section id="pillars" class="pillars">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Les 4 Piliers</span>
+                <h2 class="section-title">Plan d'Actions Détaillé</h2>
+                <p class="section-subtitle">
+                    Chaque pilier comprend des objectifs précis, des actions concrètes et des projets emblématiques
+                </p>
+            </div>
+
+            <div class="pillars-container">
+                <!-- Pillar 1: Resilience -->
+                <div class="pillar-card pillar-1 fade-in">
+                    <div class="pillar-visual">
+                        <span class="pillar-number">01</span>
+                        <i class="fas fa-water pillar-icon-main"></i>
+                    </div>
+                    <div class="pillar-content">
+                        <div class="pillar-header">
+                            <span class="pillar-tag">Pilier 1</span>
+                            <i class="fas fa-shield-alt" style="color: var(--ocean-blue);"></i>
+                        </div>
+                        <h3>Ville Résiliente</h3>
+                        <p class="pillar-objective">
+                            <strong>Objectif :</strong> Protéger Safi contre les risques naturels et organiser son développement spatial de manière durable
+                        </p>
+                       
+                        <div class="actions-grid">
+                            <div class="action-item">
+                                <h4><i class="fas fa-water" style="color: var(--ocean-blue);"></i> Oued Safi Renaissance</h4>
+                                <p>Réaménagement 8 km, digues écologiques, parc linéaire inondable</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-bell" style="color: var(--ocean-blue);"></i> Système d'Alerte</h4>
+                                <p>Capteurs intelligents, SMS d'alerte, cellule de crise municipale</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-map" style="color: var(--ocean-blue);"></i> Urbanisme Intelligent</h4>
+                                <p>Révision PDAU, zonage risques, études géotechniques complètes</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-home" style="color: var(--ocean-blue);"></i> Lutte Anarchisme</h4>
+                                <p>Régularisation progressive, relogement accompagné, prévention</p>
+                            </div>
+                        </div>
+
+                        <div class="project-highlight">
+                            <h4><i class="fas fa-star"></i> Projet Emblématique : Oued Safi Renaissance</h4>
+                            <p>Transformation du oued en corridor écologique et récréatif de 8 km avec promenade, pistes cyclables et jardins filtrants. Budget : 450 M DH (2026-2032)</p>
+                        </div>
+
+                        <div class="pillar-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Budget Total</span>
+                                <span class="meta-value">590 M DH</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Calendrier</span>
+                                <span class="meta-value">2026-2032</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Indicateur 2050</span>
+                                <span class="meta-value">0 décès inondation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pillar 2: Green -->
+                <div class="pillar-card pillar-2 fade-in">
+                    <div class="pillar-visual">
+                        <span class="pillar-number">02</span>
+                        <i class="fas fa-tree pillar-icon-main"></i>
+                    </div>
+                    <div class="pillar-content">
+                        <div class="pillar-header">
+                            <span class="pillar-tag">Pilier 2</span>
+                            <i class="fas fa-leaf" style="color: var(--safi-green);"></i>
+                        </div>
+                        <h3>Ville Verte</h3>
+                        <p class="pillar-objective">
+                            <strong>Objectif :</strong> Améliorer la qualité de vie et renforcer l'équilibre écologique du territoire
+                        </p>
+                       
+                        <div class="actions-grid">
+                            <div class="action-item">
+                                <h4><i class="fas fa-file-alt" style="color: var(--safi-green);"></i> Plan Vert Safi</h4>
+                                <p>Stratégie arbres/ha, choix essences locales, cartographie canopée</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-seedling" style="color: var(--safi-green);"></i> Jardins Urbains</h4>
+                                <p>12 jardins de quartier + 1 jardin botanique régional (50 ha)</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-water" style="color: var(--safi-green);"></i> Oued Végétalisé</h4>
+                                <p>Aménagement berges (phragmites, saules), promenades écologiques</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-users" style="color: var(--safi-green);"></i> Sensibilisation</h4>
+                                <p>Écoles vertes, implication femmes, gestion déchets, jardins partagés</p>
+                            </div>
+                        </div>
+
+                        <div class="project-highlight">
+                            <h4><i class="fas fa-star"></i> Projet Emblématique : Jardin Botanique des Arganiers</h4>
+                            <p>Conservatoire génétique de 50 ha, centre de recherche universitaire, espace pédagogique et récréatif. Budget : 80 M DH (2026-2035)</p>
+                        </div>
+
+                        <div class="pillar-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Budget Total</span>
+                                <span class="meta-value">355 M DH</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Calendrier</span>
+                                <span class="meta-value">2026-2050</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Indicateur 2050</span>
+                                <span class="meta-value">15 m² vert/hab</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pillar 3: Industry -->
+                <div class="pillar-card pillar-3 fade-in">
+                    <div class="pillar-visual">
+                        <span class="pillar-number">03</span>
+                        <i class="fas fa-industry pillar-icon-main"></i>
+                    </div>
+                    <div class="pillar-content">
+                        <div class="pillar-header">
+                            <span class="pillar-tag">Pilier 3</span>
+                            <i class="fas fa-cogs" style="color: var(--ochre);"></i>
+                        </div>
+                        <h3>Ville Industrielle Durable</h3>
+                        <p class="pillar-objective">
+                            <strong>Objectif :</strong> Moderniser l'économie locale, créer des emplois qualifiés et attirer l'investissement responsable
+                        </p>
+                       
+                        <div class="actions-grid">
+                            <div class="action-item">
+                                <h4><i class="fas fa-handshake" style="color: var(--ochre);"></i> Partenariat OCP</h4>
+                                <p>Intégration filières phosphates, sous-traitance locale, logistique</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-warehouse" style="color: var(--ochre);"></i> Safi Green Valley</h4>
+                                <p>Zone industrielle 4.0 de 100 ha, neutre en carbone, énergies renouvelables</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-pills" style="color: var(--ochre);"></i> Pôle Pharma & Agro</h4>
+                                <p>Laboratoires R&D, transformation pêche/agrumes, matériaux innovants</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-lightbulb" style="color: var(--ochre);"></i> Innovation</h4>
+                                <p>Fab-lab industriel, incubateur "Safi Tech", partenariat universités</p>
+                            </div>
+                        </div>
+
+                        <div class="project-highlight">
+                            <h4><i class="fas fa-star"></i> Projet Emblématique : Safi Green Valley</h4>
+                            <p>Zone industrielle nouvelle génération avec panneaux solaires, eau recyclée, logistique verte et bâtiments basse consommation. Budget : 300 M DH (2027-2035)</p>
+                        </div>
+
+                        <div class="pillar-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Budget Total</span>
+                                <span class="meta-value">425 M DH</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Calendrier</span>
+                                <span class="meta-value">2026-2050</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Indicateur 2050</span>
+                                <span class="meta-value">10 000 emplois</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pillar 4: Tourism -->
+                <div class="pillar-card pillar-4 fade-in">
+                    <div class="pillar-visual">
+                        <span class="pillar-number">04</span>
+                        <i class="fas fa-landmark pillar-icon-main"></i>
+                    </div>
+                    <div class="pillar-content">
+                        <div class="pillar-header">
+                            <span class="pillar-tag">Pilier 4</span>
+                            <i class="fas fa-umbrella-beach" style="color: var(--ocean-light);"></i>
+                        </div>
+                        <h3>Ville Touristique & Culturelle</h3>
+                        <p class="pillar-objective">
+                            <strong>Objectif :</strong> Réintégrer Safi dans le produit touristique national et international comme destination culturelle et balnéaire authentique
+                        </p>
+                       
+                        <div class="actions-grid">
+                            <div class="action-item">
+                                <h4><i class="fas fa-monument" style="color: var(--ocean-light);"></i> Patrimoine Révélé</h4>
+                                <p>Restauration kasbah, céramique, médina, candidature UNESCO</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-store" style="color: var(--ocean-light);"></i> Médina Réhabilitée</h4>
+                                <p>5 quartiers historiques, amélioration habitat, commerces traditionnels</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-sun" style="color: var(--ocean-light);"></i> Littoral Requalifié</h4>
+                                <p>Plages aménagées, promenade maritime, sports nautiques, écotourisme</p>
+                            </div>
+                            <div class="action-item">
+                                <h4><i class="fas fa-calendar-alt" style="color: var(--ocean-light);"></i> Événements</h4>
+                                <p>Festival céramique international, Safi Jazz, régates traditionnelles</p>
+                            </div>
+                        </div>
+
+                        <div class="project-highlight">
+                            <h4><i class="fas fa-star"></i> Projet Emblématique : La Médina Révélée</h4>
+                            <p>Musée de la Céramique de Safi dans la kasbah réhabilitée, ateliers artisans, boutiques traditionnelles et parcours patrimonial. Budget : 120 M DH (2026-2035)</p>
+                        </div>
+
+                        <div class="pillar-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Budget Total</span>
+                                <span class="meta-value">305 M DH</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Calendrier</span>
+                                <span class="meta-value">2026-2050</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Indicateur 2050</span>
+                                <span class="meta-value">500 000 touristes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section id="timeline" class="timeline">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background: rgba(255,255,255,0.2); color: white;">Calendrier</span>
+                <h2 class="section-title">Phasage 2026-2050</h2>
+                <p class="section-subtitle">
+                    5 périodes de 5 ans avec des jalons clairs et des révisions programmées
+                </p>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+               
+                <div class="timeline-item fade-in">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2026-2030</div>
+                        <h3>Fondation & Lancement</h3>
+                        <ul>
+                            <li>Lancement participatif et concertation</li>
+                            <li>Démarrage Oued Safi Renaissance</li>
+                            <li>Création Jardin Botanique</li>
+                            <li>ZI Safi Green Valley (phase 1)</li>
+                            <li>Restauration Kasbah (début)</li>
+                            <li>Maison de la Résilience</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2031-2035</div>
+                        <h3>Accélération & Consolidation</h3>
+                        <ul>
+                            <li>Finalisation oued végétalisé</li>
+                            <li>12 jardins de quartier créés</li>
+                            <li>Pôle Pharma opérationnel</li>
+                            <li>Musée Céramique inauguré</li>
+                            <li>Corniche Safi Nouvelle</li>
+                            <li>Premier bilan et ajustements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2036-2040</div>
+                        <h3>Déploiement à Grande Échelle</h3>
+                        <ul>
+                            <li>Extension zones industrielles</li>
+                            <li>Forêt urbaine du Nord (100 ha)</li>
+                            <li>Réseau écotouristique complet</li>
+                            <li>Smart city (infrastructure numérique)</li>
+                            <li>Internationalisation tourisme</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2041-2045</div>
+                        <h3>Optimisation & Rayonnement</h3>
+                        <ul>
+                            <li>Atteinte objectifs verts</li>
+                            <li>Leadership industriel régional</li>
+                            <li>Destination touristique majeure</li>
+                            <li>Transfert compétences locales</li>
+                            <li>Préparation héritage 2050</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2046-2050</div>
+                        <h3>Héritage & Perspectives</h3>
+                        <ul>
+                            <li>Bilan complet 25 ans</li>
+                            <li>Transmission nouveau mandat</li>
+                            <li>Reconnaissance internationale</li>
+                            <li>Safi ville modèle résilience</li>
+                            <li>Nouvelle vision 2050-2075</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Observatoire</span>
+                <h2 class="section-title">Tableau de Bord en Temps Réel</h2>
+                <p class="section-subtitle">
+                    Suivi transparent des indicateurs clés de performance du plan
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Espaces Verts Créés</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">12.5 <small style="font-size:1rem;">ha</small></div>
+                    <div class="metric-change">↑ +2.3 ha cette année</div>
+                    <div class="chart-placeholder">
+                        <span>Graphique évolution</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Emplois Générés</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">1,240</div>
+                    <div class="metric-change">↑ +180 vs 2025</div>
+                    <div class="chart-placeholder">
+                        <span>Répartition par secteur</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Investissement Mobilise</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">890 <small style="font-size:1rem;">M DH</small></div>
+                    <div class="metric-change">↑ 65% objectif 2030</div>
+                    <div class="chart-placeholder">
+                        <span>Répartition 4 piliers</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Participation Citoyenne</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">8,450</div>
+                    <div class="metric-change">↑ contributions en ligne</div>
+                    <div class="chart-placeholder">
+                        <span>Carte contributions</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Qualité de l'Air</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">42 <small style="font-size:1rem;">AQI</small></div>
+                    <div class="metric-change">↓ -8% vs moyenne nationale</div>
+                    <div class="chart-placeholder">
+                        <span>Stations de mesure</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-card fade-in">
+                    <div class="dashboard-header">
+                        <span class="dashboard-title">Touristes Accueillis</span>
+                        <span class="dashboard-status"></span>
+                    </div>
+                    <div class="metric-large">45,200</div>
+                    <div class="metric-change">↑ +15% vs 2025</div>
+                    <div class="chart-placeholder">
+                        <span>Saisonnalité et origines</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="#" class="btn btn-primary" style="background: var(--ocean-blue);">
+                    <i class="fas fa-download"></i> Télécharger le Rapport Annuel 2026
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Participation Section -->
+    <section id="participation" class="participation">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Agir Ensemble</span>
+                <h2 class="section-title">Participer à Rebuild Safi</h2>
+                <p class="section-subtitle">
+                    Ce plan vient de la ville et de ses habitants. Votre voix compte dans chaque décision.
+                </p>
+            </div>
+
+            <div class="participation-grid">
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>Carte Collaborative</h3>
+                    <p>Signalez les besoins de votre quartier : éclairage, voirie, espaces verts, sécurité. Les équipes techniques analysent chaque signalement.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-plus-circle"></i> Ajouter un signalement
+                    </a>
+                </div>
+
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <h3>Budget Participatif</h3>
+                    <p>Proposez et votez pour des micro-projets locaux. 5 millions de DH par an sont dédiés aux idées citoyennes.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-paper-plane"></i> Proposer un projet
+                    </a>
+                </div>
+
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Consultations en Cours</h3>
+                    <p>Participez aux enquêtes et débats en ligne sur les grands projets. Vos retours orientent les décisions d'aménagement.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-poll"></i> Voir les consultations
+                    </a>
+                </div>
+
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Assemblées de Quartier</h3>
+                    <p>Retrouvez le calendrier des réunions publiques dans les 8 quartiers de Safi et les communes rurales environnantes.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-calendar-check"></i> S'inscrire
+                    </a>
+                </div>
+
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Boîte à Idées</h3>
+                    <p>Suggérez des améliorations, des innovations ou des partenariats pour Safi 2050. Toutes les idées sont étudiées.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-rocket"></i> Soumettre une idée
+                    </a>
+                </div>
+
+                <div class="participation-card fade-in">
+                    <div class="participation-icon">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>Bénévolat</h3>
+                    <p>Rejoignez les chantiers citoyens, les animations écoles, ou devenez ambassadeur REBUILD SAFI dans votre quartier.</p>
+                    <a href="#" class="btn-participate">
+                        <i class="fas fa-heart"></i> Devenir bénévole
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Governance Section -->
+    <section class="governance">
+        <div class="container">
+            <div class="section-header">
+                span class="section-tag" style="background: rgba(255,255,255,0.2); color: white;">Gouvernance</span>
+                <h2 class="section-title">Pilotage du Plan</h2>
+                <p class="section-subtitle">
+                    Une structure transparente et multi-acteurs pour garantir la réussite sur 25 ans
+                </p>
+            </div>
+
+            <div class="org-chart">
+                <div class="org-level fade-in">
+                    <h3><i class="fas fa-crown"></i> Comité de Pilotage Stratégique</h3>
+                    <ul>
+                        <li>Wali de la Région</li>
+                        <li>Président du Conseil Communal</li>
+                        <li>Directeur Général OCP</li>
+                        <li>Représentants Ministères (Intérieur, Équipement, Industrie, Tourisme)</li>
+                        <li>Président du Conseil Régional</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Réunion semestrielle • Orientation stratégique • Validation grands projets</p>
+                </div>
+
+                <div class="org-level fade-in">
+                    <h3><i class="fas fa-cogs"></i> Comité Technique Permanent</h3>
+                    <ul>
+                        <li>Directeur Technique Commune</li>
+                        <li>Urbaniste en chef</li>
+                        <li>Économiste territorial</li>
+                        <li>Responsable environnement</li>
+                        <li>Chargé de mission OCP</li>
+                        <li>Représentant Agence Urbaine</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Réunion mensuelle • Suivi opérationnel • Résolution blocages</p>
+                </div>
+
+                <div class="org-level fade-in">
+                    <h3><i class="fas fa-users-cog"></i> 4 Cellules Opérationnelles</h3>
+                    <ul>
+                        <li><strong>Cellule Résilience :</strong> Ingénieurs, géologues, hydrauliciens</li>
+                        <li><strong>Cellule Verte :</strong> Paysagistes, écologues, forestiers</li>
+                        <li><strong>Cellule Industrie :</strong> Développeurs éco, investisseurs, formation</li>
+                        <li><strong>Cellule Tourisme :</strong> Culture, patrimoine, promotion, événementiel</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Réunions hebdomadaires • Mise en œuvre actions • Reporting</p>
+                </div>
+
+                <div class="org-level fade-in">
+                    <h3><i class="fas fa-balance-scale"></i> Instances de Contrôle</h3>
+                    <ul>
+                        <li>Conseil Communal (vote budget)</li>
+                        <li>Commission Développement</li>
+                        <li>Auditeur indépendant (annuel)</li>
+                        <li>Observatoire Citoyen (société civile)</li>
+                        <li>Médiateur du Plan</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">Transparence • Évaluation • Recours citoyens</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="resources">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Documentation</span>
+                <h2 class="section-title">Ressources & Documents</h2>
+                <p class="section-subtitle">
+                    Tous les documents publics du plan téléchargeables gratuitement
+                </p>
+            </div>
+
+            <div class="resources-grid">
+                <div class="resource-card fade-in">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Plan Stratégique 2026-2050</h3>
+                        <p>Document cadre complet avec vision, piliers, gouvernance et indicateurs</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Jan 2026</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i> PDF (12 Mo)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card fade-in">
+                    <div class="resource-icon" style="background: linear-gradient(135deg, var(--safi-green), var(--green-light));">
+                        <i class="fas fa-map"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Atlas des Projets</h3>
+                        <p>Cartographie détaillée des 50+ projets avec fiches techniques et calendriers</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Mars 2026</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i> PDF (28 Mo)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card fade-in">
+                    <div class="resource-icon" style="background: linear-gradient(135deg, var(--ochre), var(--ochre-light));">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Rapport Annuel 2026</h3>
+                        <p>Bilan première année : réalisations, indicateurs, finances et perspectives</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Déc 2026</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i> PDF (8 Mo)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card fade-in">
+                    <div class="resource-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Guide du Citoyen</h3>
+                        <p>Comprendre le plan, participer, suivre les projets : mode d'emploi pratique</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Fév 2026</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i> PDF (3 Mo)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card fade-in">
+                    <div class="resource-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Programme Financier Pluriannuel</h3>
+                        <p>Répartition budgétaire 2026-2030, sources de financement, partenariats</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Jan 2026</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-download"></i> PDF (5 Mo)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card fade-in">
+                    <div class="resource-icon" style="background: linear-gradient(135deg, #34495e, #2c3e50);">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Cahier des Charges</h3>
+                        <p>Appels d'offres en cours, consultations préalables, marchés publics</p>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-calendar"></i> Maj quotidienne</span>
+                            <a href="#" class="download-btn">
+                                <i class="fas fa-external-link-alt"></i> Consulter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h4>REBUILD SAFI</h4>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+                    Plan de Développement Territorial 2026-2050<br>
+                    Commune de Safi, Maroc
+                </p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="#vision">Vision 2050</a></li>
+                    <li><a href="#pillars">Les 4 Piliers</a></li>
+                    <li><a href="#timeline">Calendrier</a></li>
+                    <li><a href="#dashboard">Observatoire</a></li>
+                    <li><a href="#participation">Participer</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Ressources</h4>
+                <ul>
+                    <li><a href="#">Plan Stratégique (PDF)</a></li>
+                    <li><a href="#">Atlas des Projets</a></li>
+                    <li><a href="#">Open Data</a></li>
+                    <li><a href="#">API Développeurs</a></li>
+                    <li><a href="#">Presse & Médias</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt" style="margin-right: 0.5rem;"></i> Avenue Mohammed V, Safi</li>
+                    <li><i class="fas fa-phone" style="margin-right: 0.5rem;"></i> +212 5XX XX XX XX</li>
+                    <li><i class="fas fa-envelope" style="margin-right: 0.5rem;"></i> contact@rebuildsafi.ma</li>
+                    <li><i class="fas fa-clock" style="margin-right: 0.5rem;"></i> Lun-Ven: 8h-16h</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Commune de Safi - REBUILD SAFI. Tous droits réservés. |
+            <a href="#" style="color: rgba(255,255,255,0.6);">Politique de confidentialité</a> |
+            <a href="#" style="color: rgba(255,255,255,0.6);">Accessibilité</a> |
+            <a href="#" style="color: rgba(255,255,255,0.6);">Plan du site</a></p>
+        </div>
+    </footer>
+
+    <!-- Notification Bar -->
+    <div class="notification-bar" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <strong>Nouveau :</strong> Consultation publique sur l'aménagement du oued ouverte jusqu'au 30 mars 2026.
+        <a href="#participation">Participer maintenant →</a>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // Scroll Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+            } else {
+                navbar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            }
+        });
+
+        // Show notification after 3 seconds
+        setTimeout(() => {
+            document.getElementById('notification').classList.add('show');
+        }, 3000);
+
+        // Counter Animation
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+           
+            function update() {
+                start += increment;
+                if (start < target) {
+                    element.textContent = Math.floor(start);
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = target;
+                }
+            }
+            update();
+        }
+
+        // Trigger counters when hero is visible
+        const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = document.querySelectorAll('.stat-number');
+                    animateCounter(counters[0], 4, 1500);
+                    animateCounter(counters[1], 25, 2000);
+                    animateCounter(counters[2], 50, 2500);
+                    heroObserver.disconnect();
+                }
+            });
+        });
+        heroObserver.observe(document.querySelector('.hero'));
+
+        // Mobile Menu Toggle
+        document.querySelector('.mobile-menu').addEventListener('click', () => {
+            alert('Menu mobile - Intégrer drawer navigation ici');
+        });
+
+        // Interactive Map Initialization
+        var map = L.map('safi-map').setView([32.2994, -9.2372], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Project data
+        var projects = [
+            {
+                id: 1,
+                name: "Oued Safi Renaissance",
+                category: "resilience",
+                lat: 32.305,
+                lng: -9.240,
+                icon: "fa-water",
+                description: "Réaménagement 8 km du oued avec digues écologiques et parc linéaire",
+                budget: "450 M DH",
+                date: "2026-2032",
+                color: "#1B4F72"
+            },
+            {
+                id: 2,
+                name: "Maison de la Résilience",
+                category: "resilience",
+                lat: 32.295,
+                lng: -9.235,
+                icon: "fa-shield-alt",
+                description: "Centre de commandement et système d'alerte précoce",
+                budget: "45 M DH",
+                date: "2026-2028",
+                color: "#1B4F72"
+            },
+            {
+                id: 3,
+                name: "Jardin Botanique des Arganiers",
+                category: "green",
+                lat: 32.280,
+                lng: -9.220,
+                icon: "fa-seedling",
+                description: "Conservatoire génétique de 50 ha avec centre de recherche",
+                budget: "80 M DH",
+                date: "2026-2035",
+                color: "#2E7D32"
+            },
+            {
+                id: 4,
+                name: "Forêt Urbaine Nord",
+                category: "green",
+                lat: 32.315,
+                lng: -9.225,
+                icon: "fa-tree",
+                description: "Plantation de 100 ha d'espaces boisés",
+                budget: "60 M DH",
+                date: "2030-2040",
+                color: "#2E7D32"
+            },
+            {
+                id: 5,
+                name: "Safi Green Valley",
+                category: "industry",
+                lat: 32.270,
+                lng: -9.260,
+                icon: "fa-industry",
+                description: "Zone industrielle 4.0 de 100 ha, neutre en carbone",
+                budget: "300 M DH",
+                date: "2027-2035",
+                color: "#D35400"
+            },
+            {
+                id: 6,
+                name: "Musée de la Céramique",
+                category: "tourism",
+                lat: 32.298,
+                lng: -9.240,
+                icon: "fa-landmark",
+                description: "Réhabilitation de la kasbah et musée de la céramique",
+                budget: "120 M DH",
+                date: "2026-2035",
+                color: "#2E86AB"
+            },
+            {
+                id: 7,
+                name: "Médina Réhabilitée",
+                category: "tourism",
+                lat: 32.296,
+                lng: -9.238,
+                icon: "fa-monument",
+                description: "Restauration de 5 quartiers historiques",
+                budget: "90 M DH",
+                date: "2027-2035",
+                color: "#2E86AB"
+            },
+            {
+                id: 8,
+                name: "Corniche Safi Nouvelle",
+                category: "tourism",
+                lat: 32.310,
+                lng: -9.250,
+                icon: "fa-umbrella-beach",
+                description: "Aménagement de la promenade maritime",
+                budget: "55 M DH",
+                date: "2028-2032",
+                color: "#2E86AB"
+            }
+        ];
+
+        var markers = [];
+
+        function createCustomIcon(iconClass, colorClass) {
+            return L.divIcon({
+                className: 'custom-marker ' + colorClass,
+                html: '<i class="fas ' + iconClass + '"></i>',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20],
+                popupAnchor: [0, -20]
+            });
+        }
+
+        // Add markers
+        projects.forEach(function(project) {
+            var markerColor = 'marker-' + project.category;
+            var marker = L.marker([project.lat, project.lng], {
+                icon: createCustomIcon(project.icon, markerColor)
+            }).addTo(map);
+            
+            var popupContent = `
+                <div style="padding: 10px; max-width: 250px;">
+                    <h4 style="margin: 0 0 5px 0; color: ${project.color};">${project.name}</h4>
+                    <p style="margin: 0; font-size: 0.9rem; color: #666;">${project.description}</p>
+                    <div style="margin-top: 8px; font-size: 0.8rem; color: #888;">
+                        <i class="fas fa-money-bill-wave"></i> ${project.budget} | 
+                        <i class="fas fa-calendar"></i> ${project.date}
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            marker.on('click', function() {
+                showProjectDetail(project);
+            });
+            
+            markers.push({marker: marker, category: project.category});
+        });
+
+        // Filter functionality
+        function filterProjects(category) {
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            markers.forEach(function(item) {
+                if (category === 'all' || item.category === category) {
+                    item.marker.addTo(map);
+                } else {
+                    map.removeLayer(item.marker);
+                }
+            });
+        }
+
+        function showProjectDetail(project) {
+            var popup = document.getElementById('project-popup');
+            document.getElementById('popup-title').textContent = project.name;
+            document.getElementById('popup-category').textContent = project.category;
+            document.getElementById('popup-category').style.background = project.color + '20';
+            document.getElementById('popup-category').style.color = project.color;
+            document.getElementById('popup-description').textContent = project.description;
+            document.getElementById('popup-budget').textContent = project.budget;
+            document.getElementById('popup-date').textContent = project.date;
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('project-popup').style.display = 'none';
+        }
+
+        function resetMap() {
+            map.setView([32.2994, -9.2372], 13);
+        }
+
+        map.on('click', function() {
+            closePopup();
+        });
+    </script>
+</body>
+</html>
